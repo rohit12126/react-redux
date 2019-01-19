@@ -5,6 +5,7 @@ import './Post.css';
 const Post = (props) => (
     <div className='Post'>
         <Link to={`/posts/${props.id}`}><h1>{props.title}</h1></Link>
+        <button onClick={props.clicked}>Show Detail</button>
     </div>
 );
 

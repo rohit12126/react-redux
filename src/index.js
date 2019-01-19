@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './containers/App';
 import * as serviceWorker from './serviceWorker';
-import axios from 'axios';
+// import axios from 'axios';
 import { BrowserRouter } from 'react-router-dom';
-import rootReducer from './store/reducer';
-import {createStore} from 'redux';
+import { createStore, applyMiddleware, combineReducers, compose  } from 'redux';
+import counterReducer from './store/reducers/counter';
+import resultReducer from './store/reducers/result';
 import { Provider } from 'react-redux';
-
-const myStore = createStore(rootReducer);
+// import { combineReducers } from 'redux-immutable';
 
 // axios.defaults.baseURL = 'https://jsonplaceholder.typicode.com';
 
@@ -20,10 +20,31 @@ const myStore = createStore(rootReducer);
 
 // axios.defaults.headers.common['Authorization'] = 'AUTH';
 
-ReactDOM.render(<Provider store={myStore}>
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>
+const rootReducer = combineReducers({
+    coun: counterReducer,
+    res: resultReducer,
+})
+
+const logger = (store) => {
+    return (next) => {
+        return (action) => {
+            console.log('Middleware:', action);
+            const res = next(action);
+            console.log('Next State: ', store.getState());
+            return res;
+        }
+    }
+}
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const store = createStore(rootReducer, composeEnhancers(
+    applyMiddleware(logger)
+  ));
+// const store = createStore(rootReducer, applyMiddleware(logger));
+
+ReactDOM.render(<Provider store={store}>
+    <BrowserRouter><App /></BrowserRouter>
 </Provider>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
